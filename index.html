@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <title>捷匯現金運輸監控動態圖 (2025-08-02 至 2025-08-03)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.0/dist/leaflet.timedimension.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.0/dist/leaflet.timedimension.control.min.css"/>
+    <style>
+        html, body, #map { height: 100%; margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+// 初始化地圖
+var map = L.map('map', {
+    center: [22.8, 113.6],
+    zoom: 9,
+    timeDimension: true,
+    timeDimensionOptions: { timeInterval: "2025-08-02/2025-08-03", period: "PT1H" },
+    timeDimensionControl: true
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'JETHUI Cash Monitoring'
+}).addTo(map);
+
+// 模擬運輸數據 (可替換真實GPS API)
+var geojsonData = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [[113.5767,22.2707],[114.0596,22.5429]]
+            },
+            "properties": {
+                "times": ["2025-08-02T02:30:00Z", "2025-08-02T03:30:00Z"],
+                "popup": "任務: JH-TRIP-1001<br>車輛: JH-V09<br>路線: 珠海 → 深圳<br>金額: ¥6,900,000"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [[113.3926,22.5159],[113.2644,23.1291]]
+            },
+            "properties": {
+                "times": ["2025-08-02T05:00:00Z", "2025-08-02T06:15:00Z"],
+                "popup": "任務: JH-TRIP-1002<br>車輛: JH-V03<br>路線: 中山 → 廣州<br>金額: ¥4,800,000"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [[113.7518,23.0207],[114.4158,23.1123]]
+            },
+            "properties": {
+                "times": ["2025-08-03T08:30:00Z", "2025-08-03T09:30:00Z"],
+                "popup": "任務: JH-TRIP-1003<br>車輛: JH-V07<br>路線: 東莞 → 惠州<br>金額: ¥8,100,000"
+            }
+        }
+        // 你可以加入更多任務數據
+    ]
+};
+
+var timedGeoJSON = L.timeDimension.layer.geoJson(L.geoJson(geojsonData, {
+    style: function () { return {color: "lime", weight: 4}; },
+    onEachFeature: function (feature, layer) {
+        if (feature.properties.popup) {
+            layer.bindPopup(feature.properties.popup);
+        }
+    }
+}), {updateTimeDimension: true});
+
+timedGeoJSON.addTo(map);
+
+// HeatMap 效果 (可選，模擬熱區)
+var heatData = [[22.2707,113.5767,1],[22.5429,114.0596,1],[23.1291,113.2644,1]];
+L.heatLayer(heatData, {radius: 20, blur: 15}).addTo(map);
+</script>
+
+<!-- 加載HeatMap資源 -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet.heat/dist/leaflet-heat.js"></script>
+
+</body>
+</html>
